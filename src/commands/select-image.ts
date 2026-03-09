@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { tryCatch } from '../utils/result';
+import { Vibrant } from "node-vibrant/node"; 
 
 const imagePickerOptions: vscode.OpenDialogOptions = {
     canSelectFiles: true,
@@ -27,7 +28,7 @@ async function pickImageTry(options: vscode.OpenDialogOptions): Promise<string> 
     const selectedFiles: vscode.Uri[] | undefined = await vscode.window.showOpenDialog(options);
 
     if (!selectedFiles) {
-        throw new Error("select at least one image");
+        throw new Error("no image was selected.");
     }
 
     return selectedFiles[0].fsPath;
@@ -35,12 +36,20 @@ async function pickImageTry(options: vscode.OpenDialogOptions): Promise<string> 
 
 async function generateThemeTry(imagePath: string) {
 
+    const { data, err } = await tryCatch(Vibrant.from(imagePath).getPalette()); 
+
+    if(err) { 
+        throw err; 
+    }
+    
+    console.log(data); 
+
     const colors = {
-        "editor.background": "#000000",
-        "activityBar.background": "#000000",
-        "sideBar.background": "#000000",
-        "statusBar.background": "#000000",
-        "button.background": "#000000"
+        "editor.background": data.DarkMuted?.hex,
+        "activityBar.background": data.DarkVibrant?.hex,
+        "sideBar.background": data.LightMuted?.hex,
+        "statusBar.background": data.LightVibrant?.hex,
+        "button.background": data.Muted?.hex
     };
 
     const config = vscode.workspace.getConfiguration();
