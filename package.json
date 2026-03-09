@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "adityaguptadev-walltheme.helloWorld",
-        "title": "Hello World"
+        "command": "adityaguptadev-walltheme.chooseTheme",
+        "title": "Choose Theme"
       }
     ]
   },
