@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import { tryCatch } from '../utils/result';
-// import Colorthief from "colorthief";
 
 const imagePickerOptions: vscode.OpenDialogOptions = {
     canSelectFiles: true,
@@ -35,11 +34,6 @@ async function pickImageTry(options: vscode.OpenDialogOptions): Promise<string> 
 }
 
 async function generateThemeTry(imagePath: string) {
-    // const palette = await Colorthief.getPalette(imagePath);
-
-    // if (!palette) {
-    //     throw new Error("failed to get color palette");
-    // }
 
     const colors = {
         "editor.background": "#000000",
