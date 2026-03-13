@@ -17,6 +17,13 @@
         "command": "adityaguptadev-walltheme.chooseTheme",
         "title": "Choose Theme"
       }
+    ],
+    "themes": [
+      { 
+        "label": "Image Theme",
+        "path": "./themes/generated-theme.json",
+        "uiTheme": "vs-dark"
+      }
     ]
   },
   "scripts": {
