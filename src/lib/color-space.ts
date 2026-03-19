@@ -45,7 +45,7 @@ export function rgbToOklch(r: number, g: number, b: number): OKLCH {
     // OKLab → OKLCH
     const C = Math.sqrt(a * a + bLab * bLab);
     let H = Math.atan2(bLab, a) * (180 / Math.PI);
-    if (H < 0) H += 360;
+    if (H < 0) {H += 360;}
 
     return { l: L, c: C, h: H };
 }

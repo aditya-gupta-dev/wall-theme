@@ -151,12 +151,12 @@ class PQueue<T> {
     }
 
     peek(index?: number): T {
-        if (!this.sorted) this.sort();
+        if (!this.sorted) {this.sort();}
         return this.contents[index ?? this.contents.length - 1];
     }
 
     pop(): T {
-        if (!this.sorted) this.sort();
+        if (!this.sorted) {this.sort();}
         return this.contents.pop()!;
     }
 
@@ -199,12 +199,12 @@ function vboxFromPixels(
         const rval = pixel[0] >> RSHIFT;
         const gval = pixel[1] >> RSHIFT;
         const bval = pixel[2] >> RSHIFT;
-        if (rval < rmin) rmin = rval;
-        else if (rval > rmax) rmax = rval;
-        if (gval < gmin) gmin = gval;
-        else if (gval > gmax) gmax = gval;
-        if (bval < bmin) bmin = bval;
-        else if (bval > bmax) bmax = bval;
+        if (rval < rmin) {rmin = rval;}
+        else if (rval > rmax) {rmax = rval;}
+        if (gval < gmin) {gmin = gval;}
+        else if (gval > gmax) {gmax = gval;}
+        if (bval < bmin) {bmin = bval;}
+        else if (bval > bmax) {bmax = bval;}
     }
 
     return new VBox(rmin, rmax, gmin, gmax, bmin, bmax, histo);
@@ -215,10 +215,10 @@ function vboxFromPixels(
 // ---------------------------------------------------------------------------
 
 function medianCutApply(histo: Uint32Array, vbox: VBox): [VBox, VBox | null] | undefined {
-    if (!vbox.count()) return undefined;
+    if (!vbox.count()) {return undefined;}
 
     // Only one pixel — no split possible
-    if (vbox.count() === 1) return [vbox.copy(), null];
+    if (vbox.count() === 1) {return [vbox.copy(), null];}
 
     const rw = vbox.r2 - vbox.r1 + 1;
     const gw = vbox.g2 - vbox.g1 + 1;
@@ -287,9 +287,17 @@ function medianCutApply(histo: Uint32Array, vbox: VBox): [VBox, VBox | null] | u
                 }
 
                 // Avoid 0-count boxes
-                while (!partialsum[d2]) d2++;
+                let d2Tries = 0;
+                while (!partialsum[d2] && d2Tries < partialsum.length) {
+                    d2++;
+                    d2Tries++;
+                }
                 let count2 = lookaheadsum[d2];
-                while (!count2 && partialsum[d2 - 1]) count2 = lookaheadsum[--d2];
+                let count2Tries = 0;
+                while (!count2 && partialsum[d2 - 1] && count2Tries < lookaheadsum.length) {
+                    count2 = lookaheadsum[--d2];
+                    count2Tries++;
+                }
 
                 // Set dimensions
                 vbox1[dim2] = d2;
@@ -301,8 +309,8 @@ function medianCutApply(histo: Uint32Array, vbox: VBox): [VBox, VBox | null] | u
         return undefined;
     }
 
-    if (maxw === rw) return doCut('r');
-    if (maxw === gw) return doCut('g');
+    if (maxw === rw) {return doCut('r');}
+    if (maxw === gw) {return doCut('g');}
     return doCut('b');
 }
 
@@ -315,7 +323,7 @@ function iterate(pq: PQueue<VBox>, target: number, histo: Uint32Array): void {
     let niters = 0;
 
     while (niters < MAX_ITERATIONS) {
-        if (ncolors >= target) return;
+        if (ncolors >= target) {return;}
         niters++;
 
         const vbox = pq.pop();
@@ -326,7 +334,7 @@ function iterate(pq: PQueue<VBox>, target: number, histo: Uint32Array): void {
         }
 
         const result = medianCutApply(histo, vbox);
-        if (!result || !result[0]) return;
+        if (!result || !result[0]) {return;}
 
         pq.push(result[0]);
         if (result[1]) {
@@ -344,7 +352,7 @@ function quantize(
     pixels: Array<[number, number, number]>,
     maxColors: number,
 ): Array<{ color: [number, number, number]; population: number }> {
-    if (!pixels.length || maxColors < 2 || maxColors > 256) return [];
+    if (!pixels.length || maxColors < 2 || maxColors > 256) {return [];}
 
     // Short-circuit: if unique colors <= maxColors, return them directly
     const seenColors = new Set<string>();

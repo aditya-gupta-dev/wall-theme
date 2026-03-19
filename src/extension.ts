@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
 
-	const disposable = vscode.commands.registerCommand('adityaguptadev-walltheme.chooseTheme', selectImageCommandCallback);
+	const disposable = vscode.commands.registerCommand('adityaguptadev-walltheme.chooseTheme', selectImageCommandCallback(context));
 
 	context.subscriptions.push(disposable);
 }

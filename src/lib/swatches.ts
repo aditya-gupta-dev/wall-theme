@@ -43,9 +43,9 @@ function score(
     const { l, c } = color.oklch();
 
     // Out of lightness range → disqualified
-    if (l < target.minL || l > target.maxL) return -Infinity;
+    if (l < target.minL || l > target.maxL) {return -Infinity;}
     // Below minimum chroma → disqualified
-    if (c < target.minC) return -Infinity;
+    if (c < target.minC) {return -Infinity;}
 
     const lDist = 1 - Math.abs(l - target.targetL);
     const cDist = 1 - Math.min(Math.abs(c - target.targetC) / 0.2, 1);
@@ -115,7 +115,7 @@ export function classifySwatches(palette: Color[]): SwatchMap {
             let fallback: Color | null = null;
             let fallbackScore = -Infinity;
             for (const color of palette) {
-                if (used.has(color)) continue;
+                if (used.has(color)) {continue;}
                 const s = score(color, target, maxPopulation);
                 if (s > fallbackScore) {
                     fallbackScore = s;

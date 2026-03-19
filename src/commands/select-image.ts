@@ -18,29 +18,31 @@ const imagePickerOptions: vscode.OpenDialogOptions = {
 
 const themeFilePath = "./themes/generated-theme.json";
 
-export async function selectImageCommandCallback() {
-    const imagePickResult = await tryCatch(pickImageTry(imagePickerOptions));
+export function selectImageCommandCallback(context: vscode.ExtensionContext) {
+    return async () => {
+        const imagePickResult = await tryCatch(pickImageTry(imagePickerOptions));
 
-    if (imagePickResult.err) {
-        vscode.window.showErrorMessage(imagePickResult.err.message);
-        return;
-    }
+        if (imagePickResult.err) {
+            vscode.window.showErrorMessage(imagePickResult.err.message);
+            return;
+        }
 
-    const generateThemeResult = await tryCatch(generateThemeTry(imagePickResult.data));
+        const generateThemeResult = await tryCatch(generateThemeTry(imagePickResult.data));
 
-    if (generateThemeResult.err) {
-        vscode.window.showErrorMessage(generateThemeResult.err.message);
-        return;
-    }
+        if (generateThemeResult.err) {
+            vscode.window.showErrorMessage(generateThemeResult.err.message);
+            return;
+        }
 
-    const updateThemeFileResult = await tryCatch(updateThemeFileTry(generateThemeResult.data));
+        const updateThemeFileResult = await tryCatch(updateThemeFileTry(context, generateThemeResult.data));
 
-    if (updateThemeFileResult.err) {
-        vscode.window.showErrorMessage(updateThemeFileResult.err.message);
-        return;
-    }
+        if (updateThemeFileResult.err) {
+            vscode.window.showErrorMessage(updateThemeFileResult.err.message);
+            return;
+        }
 
-    // await updateEditorTheme();
+        // await updateEditorTheme();
+    };
 }
 
 async function pickImageTry(options: vscode.OpenDialogOptions): Promise<string> {
@@ -55,12 +57,14 @@ async function pickImageTry(options: vscode.OpenDialogOptions): Promise<string> 
 }
 
 async function generateThemeTry(imagePath: string): Promise<Color[] | null> {
-    console.log("generating theme...");
-
-    getPalette(imagePath).then((val) => console.log('something: ', val)); 
+    console.log("generating theme for image:", imagePath);
 
     const { data: palette, err } = await tryCatch(getPalette(imagePath));
+    
+    console.log("getPalette returned");
+
     if (err) {
+        console.error("Error generating palette:", err);
         throw err;
     }
 
@@ -68,22 +72,16 @@ async function generateThemeTry(imagePath: string): Promise<Color[] | null> {
     return palette;
 }
 
-async function updateThemeFileTry(palette: Color[] | null) {
+async function updateThemeFileTry(context: vscode.ExtensionContext, palette: Color[] | null) {
+    const filePath = path.join(context.extensionPath, 'themes', 'generated-theme.json');
 
-    const filePath = path.join(os.homedir(), ".config", "Code", themeFilePath);
-
-    if (!(await isFileExists(filePath))) {
-        await fs.open(filePath, 'w');
-    }
-
-    const { err } = await tryCatch(
-        fs.writeFile(
+    try {
+        await fs.mkdir(path.dirname(filePath), { recursive: true });
+        await fs.writeFile(
             filePath,
             JSON.stringify(palette, null, 2),
-        )
-    );
-
-    if (err) {
+        );
+    } catch (err) {
         throw err;
     }
 }

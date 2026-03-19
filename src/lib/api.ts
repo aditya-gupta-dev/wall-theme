@@ -45,8 +45,12 @@ export function configure(opts: {
 // ---------------------------------------------------------------------------
 
 async function getLoader(perCall?: PixelLoader<ImageSource>): Promise<PixelLoader<ImageSource>> {
+    console.log("loader-1");
     if (perCall) { return perCall; }
+    console.log("loader-2");
     if (globalLoader) { return globalLoader; }
+    console.log("loader-3");
+    
     globalLoader = await resolveDefaultLoader();
     return globalLoader;
 }
@@ -69,7 +73,7 @@ async function getQuantizer(perCall?: Quantizer): Promise<Quantizer> {
 
 function checkAborted(signal?: AbortSignal): void {
     if (signal?.aborted) {
-        throw signal.reason ?? new Error('Aborted'); 
+        throw signal.reason ?? new Error('Aborted');
     }
 }
 
@@ -77,9 +81,14 @@ async function loadPixels(
     source: ImageSource,
     options?: ExtractionOptions,
 ): Promise<PixelData> {
+    console.log('loadPixels: starting');
     checkAborted(options?.signal);
+    console.log('loadPixels: getting loader');
     const loader = await getLoader(options?.loader);
-    return loader.load(source, options?.signal);
+    console.log('loadPixels: loading source');
+    const result = await loader.load(source, options?.signal);
+    console.log('loadPixels: finished');
+    return result;
 }
 
 // ---------------------------------------------------------------------------
@@ -121,20 +130,25 @@ export async function getPalette(
 
     checkAborted(options?.signal);
 
+    console.log('getPalette: awaiting loadPixels and getQuantizer');
     const [pixels, quantizer] = await Promise.all([
         loadPixels(source, options),
         getQuantizer(options?.quantizer),
     ]);
+    console.log('getPalette: loadPixels and getQuantizer completed');
 
     checkAborted(options?.signal);
 
-    return extractPalette(
+    console.log('getPalette: extracting palette');
+    const result = extractPalette(
         pixels.data,
         pixels.width,
         pixels.height,
         opts,
         quantizer,
     );
+    console.log('getPalette: palette extracted');
+    return result;
 }
 
 /**

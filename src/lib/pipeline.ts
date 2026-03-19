@@ -97,7 +97,7 @@ export function createPixelArray(
         const a = data[offset + 3];
 
         // Skip transparent pixels
-        if (a !== undefined && a < alphaThreshold) continue;
+        if (a !== undefined && a < alphaThreshold) {continue;}
 
         // Skip white pixels
         if (
@@ -106,13 +106,13 @@ export function createPixelArray(
             g > whiteThreshold &&
             b > whiteThreshold
         )
-            continue;
+            {continue;}
 
         // Skip low-saturation pixels
         if (minSaturation > 0) {
             const max = Math.max(r, g, b);
             if (max === 0 || (max - Math.min(r, g, b)) / max < minSaturation)
-                continue;
+                {continue;}
         }
 
         pixelArray.push([r, g, b]);
@@ -143,7 +143,7 @@ export function computeFallbackColor(
         count++;
     }
 
-    if (count === 0) return null;
+    if (count === 0) {return null;}
 
     return [
         Math.round(rTotal / count),
