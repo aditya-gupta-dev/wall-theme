@@ -1,11 +1,10 @@
 import * as vscode from 'vscode';
 import { tryCatch } from '../utils/result';
-import { Vibrant } from "node-vibrant/node";
 import fs from "fs/promises";
 import path from 'path';
 import os from "os";
-import { Palette } from '../models/color';
 import { isFileExists } from '../utils/fs';
+import { getPalette, Color } from "../lib/"; 
 
 const imagePickerOptions: vscode.OpenDialogOptions = {
     canSelectFiles: true,
@@ -55,34 +54,25 @@ async function pickImageTry(options: vscode.OpenDialogOptions): Promise<string> 
     return selectedFiles[0].fsPath;
 }
 
-async function generateThemeTry(imagePath: string): Promise<Palette> {
-
-    const { data, err } = await tryCatch(Vibrant.from(imagePath).getPalette());
-
-    if (err) {
-        throw err;
-    }
-
-    return {
-        light: JSON.stringify(data.DarkMuted?.toJSON())
-    };
+async function generateThemeTry(imagePath: string): Promise<Color[] | null> {
+    return await getPalette(imagePath); 
 }
 
 // TODO: complete the palette type 
-async function updateThemeFileTry(palette: Palette) {
+async function updateThemeFileTry(palette: Color[] | null) {
 
     const filePath = path.join(os.homedir(), ".config", "Code", themeFilePath);
 
-    if (!(await isFileExists(filePath))) { 
-        await fs.open(filePath, 'w'); 
+    if (!(await isFileExists(filePath))) {
+        await fs.open(filePath, 'w');
     }
 
-        const { err } = await tryCatch(
-            fs.writeFile(
-                filePath,
-                JSON.stringify({ ad: Math.random().toString() }, null, 2),
-            )
-        );
+    const { err } = await tryCatch(
+        fs.writeFile(
+            filePath,
+            JSON.stringify({ ad: Math.random().toString() }, null, 2),
+        )
+    );
 
     if (err) {
         throw err;
