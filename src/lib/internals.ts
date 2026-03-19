@@ -7,10 +7,8 @@
 
 // Quantizers
 export { MmcqQuantizer } from './quantizers/mmcq.js';
-export { WasmQuantizer } from './quantizers/wasm.js';
 
 // Loaders
-export { BrowserPixelLoader } from './loaders/browser.js';
 export { NodePixelLoader, createNodeLoader } from './loaders/node.js';
 export type { NodeImageDecoder } from './loaders/node.js';
 
@@ -26,13 +24,6 @@ export {
     pixelsRgbToOklchScaled,
     paletteOklchScaledToRgb,
 } from './color-space.js';
-
-// Worker manager
-export {
-    isWorkerSupported,
-    extractInWorker,
-    terminateWorker,
-} from './worker/manager.js';
 
 // Low-level pipeline
 export {

@@ -36,8 +36,8 @@ export function configure(opts: {
     loader?: PixelLoader<ImageSource>;
     quantizer?: Quantizer;
 }): void {
-    if (opts.loader) globalLoader = opts.loader;
-    if (opts.quantizer) globalQuantizer = opts.quantizer;
+    if (opts.loader) { globalLoader = opts.loader; };
+    if (opts.quantizer) { globalQuantizer = opts.quantizer; };
 }
 
 // ---------------------------------------------------------------------------
@@ -45,8 +45,8 @@ export function configure(opts: {
 // ---------------------------------------------------------------------------
 
 async function getLoader(perCall?: PixelLoader<ImageSource>): Promise<PixelLoader<ImageSource>> {
-    if (perCall) return perCall;
-    if (globalLoader) return globalLoader;
+    if (perCall) { return perCall; }
+    if (globalLoader) { return globalLoader; }
     globalLoader = await resolveDefaultLoader();
     return globalLoader;
 }
@@ -56,7 +56,7 @@ async function getQuantizer(perCall?: Quantizer): Promise<Quantizer> {
         await perCall.init();
         return perCall;
     }
-    if (globalQuantizer) return globalQuantizer;
+    if (globalQuantizer) { return globalQuantizer; }
     const q = new MmcqQuantizer();
     await q.init();
     globalQuantizer = q;
@@ -69,7 +69,7 @@ async function getQuantizer(perCall?: Quantizer): Promise<Quantizer> {
 
 function checkAborted(signal?: AbortSignal): void {
     if (signal?.aborted) {
-        throw signal.reason ?? new DOMException('Aborted', 'AbortError');
+        throw signal.reason ?? new Error('Aborted'); 
     }
 }
 
@@ -120,25 +120,6 @@ export async function getPalette(
     const opts = validateOptions(options ?? {});
 
     checkAborted(options?.signal);
-
-    // Worker path (browser only)
-    if (options?.worker) {
-        const { isWorkerSupported, extractInWorker } = await import(
-            './worker/manager.js'
-        );
-        if (isWorkerSupported()) {
-            const { data, width, height } = await loadPixels(source, options);
-            const { createPixelArray } = await import('./pipeline.js');
-            const pixelArray = createPixelArray(data, width * height, opts.quality, {
-                ignoreWhite: opts.ignoreWhite,
-                whiteThreshold: opts.whiteThreshold,
-                alphaThreshold: opts.alphaThreshold,
-                minSaturation: opts.minSaturation,
-            });
-            return extractInWorker(pixelArray, opts.colorCount, options?.signal);
-        }
-        // Fall through to main thread if workers not supported
-    }
 
     const [pixels, quantizer] = await Promise.all([
         loadPixels(source, options),

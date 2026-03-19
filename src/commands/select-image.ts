@@ -4,7 +4,7 @@ import fs from "fs/promises";
 import path from 'path';
 import os from "os";
 import { isFileExists } from '../utils/fs';
-import { getPalette, Color } from "../lib/"; 
+import { getPalette, Color } from "../lib/";
 
 const imagePickerOptions: vscode.OpenDialogOptions = {
     canSelectFiles: true,
@@ -40,7 +40,7 @@ export async function selectImageCommandCallback() {
         return;
     }
 
-    await updateEditorTheme();
+    // await updateEditorTheme();
 }
 
 async function pickImageTry(options: vscode.OpenDialogOptions): Promise<string> {
@@ -55,10 +55,19 @@ async function pickImageTry(options: vscode.OpenDialogOptions): Promise<string> 
 }
 
 async function generateThemeTry(imagePath: string): Promise<Color[] | null> {
-    return await getPalette(imagePath); 
+    console.log("generating theme...");
+
+    getPalette(imagePath).then((val) => console.log('something: ', val)); 
+
+    const { data: palette, err } = await tryCatch(getPalette(imagePath));
+    if (err) {
+        throw err;
+    }
+
+    console.log("generated-theme: ", palette);
+    return palette;
 }
 
-// TODO: complete the palette type 
 async function updateThemeFileTry(palette: Color[] | null) {
 
     const filePath = path.join(os.homedir(), ".config", "Code", themeFilePath);
@@ -70,7 +79,7 @@ async function updateThemeFileTry(palette: Color[] | null) {
     const { err } = await tryCatch(
         fs.writeFile(
             filePath,
-            JSON.stringify({ ad: Math.random().toString() }, null, 2),
+            JSON.stringify(palette, null, 2),
         )
     );
 

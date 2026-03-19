@@ -170,19 +170,13 @@ export interface Quantizer {
 // ---------------------------------------------------------------------------
 
 /** Browser image source types. */
-export type BrowserSource =
-    | HTMLImageElement
-    | HTMLCanvasElement
-    | HTMLVideoElement
-    | ImageData
-    | ImageBitmap
-    | OffscreenCanvas;
+export type BrowserSource = string; 
 
 /** Node.js image source types. */
 export type NodeSource = string | Buffer;
 
 /** Union of all supported source types. */
-export type ImageSource = BrowserSource | NodeSource;
+export type ImageSource = NodeSource;
 
 // ---------------------------------------------------------------------------
 // Progressive extraction
